@@ -4,7 +4,6 @@ import cats.data.OptionT
 import cats.effect.{ExitCode, Resource}
 import cats.syntax.option._
 import fs2._
-import javax.net.ssl.SSLContext
 import monix.eval.{Task, TaskApp}
 import monix.execution.Scheduler
 import org.http4s._
@@ -52,7 +51,6 @@ object Main extends TaskApp {
 
   val clientResource: Resource[Task, Client[Task]] =
     BlazeClientBuilder[Task](Scheduler.global)
-      .withSslContext(SSLContext.getDefault)
       .resource
 
   def service: HttpRoutes[Task] = HttpRoutes[Task] { request =>
