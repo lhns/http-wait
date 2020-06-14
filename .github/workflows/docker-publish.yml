@@ -15,7 +15,7 @@ on:
 
 env:
   # TODO: Change variable to your image's name.
-  IMAGE_NAME: http-wait
+  IMAGE_NAME: lolhens/http-wait
 
 jobs:
   # Run tests.
@@ -50,17 +50,10 @@ jobs:
         run: docker build . --file Dockerfile --tag $IMAGE_NAME
 
       - name: Log into registry
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
+        run: docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_TOKEN"
 
       - name: Push image
         run: |
-          IMAGE_ID=lolhens/$IMAGE_NAME
-
-          docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_TOKEN"
-
-          # Change all uppercase to lowercase
-          IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
-
           # Strip git ref prefix from version
           VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
 
