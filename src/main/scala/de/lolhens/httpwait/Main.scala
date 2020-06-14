@@ -5,10 +5,9 @@ import cats.effect.{ExitCode, Resource}
 import cats.syntax.option._
 import fs2._
 import monix.eval.{Task, TaskApp}
-import monix.execution.Scheduler
 import org.http4s._
 import org.http4s.client.Client
-import org.http4s.client.blaze.BlazeClientBuilder
+import org.http4s.client.jdkhttpclient.JdkHttpClient
 import org.http4s.dsl.task._
 import org.http4s.headers.Host
 import org.http4s.implicits._
@@ -50,8 +49,7 @@ object Main extends TaskApp {
   }
 
   val clientResource: Resource[Task, Client[Task]] =
-    BlazeClientBuilder[Task](Scheduler.global)
-      .resource
+    Resource.liftF(JdkHttpClient.simple[Task].memoizeOnSuccess)
 
   def service: HttpRoutes[Task] = HttpRoutes[Task] { request =>
     val uri = request.uri.path.split("/").filter(_.nonEmpty).toList match {

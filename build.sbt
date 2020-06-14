@@ -10,7 +10,7 @@ libraryDependencies ++= Seq(
   "io.monix" %% "monix" % "3.2.2",
   "org.http4s" %% "http4s-dsl" % http4sVersion,
   "org.http4s" %% "http4s-blaze-server" % http4sVersion,
-  "org.http4s" %% "http4s-blaze-client" % http4sVersion,
+  "org.http4s" %% "http4s-jdk-http-client" % "0.3.0",
 )
 
 addCompilerPlugin("com.olegpy" %% "better-monadic-for" % "0.3.1")
@@ -53,6 +53,5 @@ graalVMNativeImageOptions ++= Seq(
   "--initialize-at-build-time",
   "--install-exit-handlers",
   "--enable-https",
-  "--initialize-at-run-time=javax.net.ssl.SSLContext", //org.http4s.client.blaze.BlazeClientBuilder
   "--allow-incomplete-classpath" /*logback-classic*/
 )
