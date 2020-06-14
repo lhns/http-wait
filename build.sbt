@@ -12,3 +12,32 @@ libraryDependencies ++= Seq(
   "org.http4s" %% "http4s-blaze-server" % http4sVersion,
   "org.http4s" %% "http4s-blaze-client" % http4sVersion,
 )
+
+addCompilerPlugin("com.olegpy" %% "better-monadic-for" % "0.3.1")
+
+assembly / assemblyJarName := s"${name.value}-${version.value}.sh.bat"
+
+assembly / assemblyOption := (assembly / assemblyOption).value
+  .copy(prependShellScript = Some(AssemblyPlugin.defaultUniversalScript(shebang = false)))
+
+assembly / assemblyMergeStrategy := {
+  case PathList("module-info.class") =>
+    MergeStrategy.discard
+
+  case PathList("META-INF", "jpms.args") =>
+    MergeStrategy.discard
+
+  case PathList("META-INF", "io.netty.versions.properties") =>
+    MergeStrategy.first
+
+  case x =>
+    val oldStrategy = (assembly / assemblyMergeStrategy).value
+    oldStrategy(x)
+}
+
+enablePlugins(
+  GraalVMNativeImagePlugin
+)
+
+GraalVMNativeImage / name := (GraalVMNativeImage / name).value + "-" + (GraalVMNativeImage / version).value
+graalVMNativeImageOptions ++= Seq("--no-server", "--no-fallback", "--initialize-at-build-time")
