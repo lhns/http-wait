@@ -52,6 +52,6 @@ graalVMNativeImageOptions ++= Seq(
   "--no-fallback",
   "--initialize-at-build-time",
   "--install-exit-handlers",
-  "--enable-https",
+  "--enable-url-protocols=http,https",
   "--allow-incomplete-classpath" /*logback-classic*/
 )
