@@ -21,8 +21,8 @@ object Main extends TaskApp {
 
   private val host = env.getOrElse("SERVER_HOST", "0.0.0.0")
   private val port = env.getOrElse("SERVER_PORT", "8080").toInt
-  private val statusCodes: List[Status] = env.getOrElse("STATUS_CODES", "200")
-    .split("\\s,\\s").toList.filter(_.nonEmpty).map(e => Status.fromInt(e.toInt).toTry.get)
+  private val statusCodes: List[Status] = env.getOrElse("STATUS_CODES", "200,401")
+    .split("\\s*,\\s*").toList.filter(_.nonEmpty).map(e => Status.fromInt(e.toInt).toTry.get)
   private val timeout: Duration = Duration(env.getOrElse("CLIENT_TIMEOUT", "5min"))
   private val interval: FiniteDuration = Duration(env.getOrElse("CLIENT_INTERVAL", "1s")) match {
     case finite: FiniteDuration => finite
@@ -30,6 +30,12 @@ object Main extends TaskApp {
   }
 
   override def run(args: List[String]): Task[ExitCode] = Task.deferAction { implicit scheduler =>
+    println(s"SERVER_HOST: $host")
+    println(s"SERVER_PORT: $port")
+    println(s"STATUS_CODES: ${statusCodes.map(_.code).mkString(",")}")
+    println(s"CLIENT_TIMEOUT: $timeout")
+    println(s"CLIENT_INTERVAL: $interval")
+
     BlazeServerBuilder[Task]
       .bindHttp(port, host)
       .withHttpApp(service.orNotFound)
