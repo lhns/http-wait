@@ -53,5 +53,6 @@ graalVMNativeImageOptions ++= Seq(
   "--initialize-at-build-time",
   "--install-exit-handlers",
   "--enable-https",
+  "--initialize-at-run-time=javax.net.ssl.SSLContext", //org.http4s.client.blaze.BlazeClientBuilder
   "--allow-incomplete-classpath" /*logback-classic*/
 )
