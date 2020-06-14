@@ -2,6 +2,7 @@ package de.lolhens.httpwait
 
 import cats.data.OptionT
 import cats.effect.ExitCode
+import cats.syntax.option._
 import fs2._
 import monix.eval.{Task, TaskApp}
 import monix.execution.Scheduler
@@ -60,16 +61,31 @@ object Main extends TaskApp {
       newRequest = request.withUri(uri).putHeaders(hostHeader).withBodyStream(Stream.chunk(Chunk.bytes(requestBytes)))
       response <- BlazeClientBuilder[Task](Scheduler.global).resource.use { client =>
         println(newRequest)
-        lazy val retryForCode: Task[Response[Task]] = client.run(newRequest).use { response =>
-          println(response.status)
-          if (statusCodes.contains(response.status))
-            for {
-              responseBytes <- response.as[Array[Byte]]
-            } yield
-              response.withBodyStream(Stream.chunk(Chunk.bytes(responseBytes)))
-          else
-            Task.sleep(interval) *>
-              retryForCode
+
+        lazy val retryForCode: Task[Response[Task]] = {
+          client.run(newRequest).use { response =>
+            println(response.status)
+
+            if (statusCodes.contains(response.status))
+              for {
+                responseBytes <- response.as[Array[Byte]]
+              } yield
+                response.withBodyStream(Stream.chunk(Chunk.bytes(responseBytes))).some
+            else
+              Task.now(none)
+          }
+            .onErrorHandle { err =>
+              err.printStackTrace()
+              none
+            }
+            .flatMap {
+              case Some(response) =>
+                Task.now(response)
+
+              case None =>
+                Task.sleep(interval) *>
+                  retryForCode
+            }
         }
 
         Task.race(
