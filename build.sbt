@@ -40,4 +40,10 @@ enablePlugins(
 )
 
 GraalVMNativeImage / name := (GraalVMNativeImage / name).value + "-" + (GraalVMNativeImage / version).value
-graalVMNativeImageOptions ++= Seq("--no-server", "--no-fallback", "--initialize-at-build-time")
+graalVMNativeImageOptions ++= Seq(
+  "--no-server",
+  "--no-fallback",
+  "--initialize-at-build-time",
+  "--install-exit-handlers",
+  "--allow-incomplete-classpath" /*logback-classic*/
+)
