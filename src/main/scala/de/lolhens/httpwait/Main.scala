@@ -1,12 +1,14 @@
 package de.lolhens.httpwait
 
 import cats.data.OptionT
-import cats.effect.ExitCode
+import cats.effect.{ExitCode, Resource}
 import cats.syntax.option._
 import fs2._
+import javax.net.ssl.SSLContext
 import monix.eval.{Task, TaskApp}
 import monix.execution.Scheduler
 import org.http4s._
+import org.http4s.client.Client
 import org.http4s.client.blaze.BlazeClientBuilder
 import org.http4s.dsl.task._
 import org.http4s.headers.Host
@@ -48,6 +50,11 @@ object Main extends TaskApp {
     }) *> GatewayTimeout()
   }
 
+  val clientResource: Resource[Task, Client[Task]] =
+    BlazeClientBuilder[Task](Scheduler.global)
+      .withSslContext(SSLContext.getDefault)
+      .resource
+
   def service: HttpRoutes[Task] = HttpRoutes[Task] { request =>
     val uri = request.uri.path.split("/").filter(_.nonEmpty).toList match {
       case (scheme@("http" | "https")) +: authority +: parts =>
@@ -60,7 +67,7 @@ object Main extends TaskApp {
     val response = for {
       requestBytes <- request.as[Array[Byte]]
       newRequest = request.withUri(uri).putHeaders(hostHeader).withBodyStream(Stream.chunk(Chunk.bytes(requestBytes)))
-      response <- BlazeClientBuilder[Task](Scheduler.global).resource.use { client =>
+      response <- clientResource.use { client =>
         println(newRequest)
 
         lazy val retryForCode: Task[Response[Task]] = {
