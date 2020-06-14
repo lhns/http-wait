@@ -1,5 +1,5 @@
 name := "http-wait"
-version := "0.0.1-SNAPSHOT"
+version := "0.0.1"
 
 scalaVersion := "2.13.2"
 
