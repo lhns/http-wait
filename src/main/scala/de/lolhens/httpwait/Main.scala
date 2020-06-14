@@ -26,6 +26,7 @@ object Main extends TaskApp {
   private val timeout: Duration = Duration(env.getOrElse("CLIENT_TIMEOUT", "5min"))
   private val interval: FiniteDuration = Duration(env.getOrElse("CLIENT_INTERVAL", "1s")) match {
     case finite: FiniteDuration => finite
+    case _ => throw new IllegalArgumentException("CLIENT_INTERVAL must be finite!")
   }
 
   override def run(args: List[String]): Task[ExitCode] = Task.deferAction { implicit scheduler =>
