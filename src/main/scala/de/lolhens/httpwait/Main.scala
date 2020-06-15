@@ -19,14 +19,12 @@ import scala.jdk.CollectionConverters._
 object Main extends TaskApp {
   val env: Map[String, String] = System.getenv().asScala.toMap.map(e => (e._1, e._2.trim)).filter(_._2.nonEmpty)
 
-  println(env)
-
   private val host = env.getOrElse("SERVER_HOST", "0.0.0.0")
   private val port = env.getOrElse("SERVER_PORT", "8080").toInt
   private val statusCodes: List[Status] = env.getOrElse("STATUS_CODES", "200")
     .split("\\s*,\\s*").toList.filter(_.nonEmpty).map(e => Status.fromInt(e.toInt).toTry.get)
   private val timeout: Duration = Duration(env.getOrElse("CLIENT_TIMEOUT", "5min"))
-  private val interval: FiniteDuration = Duration(env.getOrElse("CLIENT_INTERVAL", "1s")) match {
+  private val interval: FiniteDuration = Duration(env.getOrElse("CLIENT_INTERVAL", "5s")) match {
     case finite: FiniteDuration => finite
     case _ => throw new IllegalArgumentException("CLIENT_INTERVAL must be finite!")
   }
