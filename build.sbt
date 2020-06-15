@@ -51,6 +51,7 @@ graalVMNativeImageOptions ++= Seq(
   "--no-server",
   "--no-fallback",
   "--initialize-at-build-time",
+  "--initialize-at-run-time=de.lolhens.httpwait.Main$",
   "--install-exit-handlers",
   "--enable-url-protocols=http,https",
   "--allow-incomplete-classpath" /*logback-classic*/
