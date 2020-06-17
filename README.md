@@ -6,7 +6,7 @@ Simple http proxy that delays the response until an expected status code is rece
 - SERVER_PORT: listen port (default: 8080)
 - STATUS_CODES: expected status codes comma separated (default: 200)
 - CLIENT_TIMEOUT: time to delay response until gateway timeout (default: 5min)
-- CLIENT_INTERVAL: retry interval (default: 1s)
+- CLIENT_INTERVAL: retry interval (default: 5s)
 
 ## Docker builds
 https://hub.docker.com/repository/docker/lolhens/http-wait
