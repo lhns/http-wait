@@ -1,11 +1,12 @@
 name := "http-wait"
 version := "0.0.1-SNAPSHOT"
 
-scalaVersion := "2.13.2"
+scalaVersion := "2.13.3"
 
-val http4sVersion = "0.21.3"
+val http4sVersion = "0.21.6"
 
 libraryDependencies ++= Seq(
+  "org.slf4j" % "slf4j-api" % "1.7.30",
   "ch.qos.logback" % "logback-classic" % "1.2.3",
   "io.monix" %% "monix" % "3.2.2",
   "org.http4s" %% "http4s-dsl" % http4sVersion,
