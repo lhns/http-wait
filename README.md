@@ -12,5 +12,5 @@ Simple http proxy that delays the response until an expected status code is rece
 ## Docker builds
 https://hub.docker.com/repository/docker/lolhens/http-wait
 
-## Licensing
+## License
 This project uses the Apache 2.0 License. See the file called LICENSE.
