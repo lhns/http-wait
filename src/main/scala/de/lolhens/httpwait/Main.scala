@@ -55,6 +55,16 @@ object Main extends TaskApp {
   }
 
   object Options {
+    val default: Options = Options(
+      logLevel = Level.INFO,
+      host = "0.0.0.0",
+      port = 8080,
+      statusCodes = List(Status.Ok),
+      retryTimeout = 5.minutes,
+      retryInterval = 5.seconds,
+      connectTimeout = 5.seconds
+    )
+
     def fromEnv: Options = {
       val env: Map[String, String] = System.getenv().asScala.toMap.map(e => (e._1, e._2.trim)).filter(_._2.nonEmpty)
 
@@ -63,16 +73,16 @@ object Main extends TaskApp {
         case _ => throw new IllegalArgumentException(s"$name must be finite!")
       }
 
-      val logLevel: Level = env.get("LOG_LEVEL").map(Level.valueOf).getOrElse(Level.INFO)
-      val host: String = env.getOrElse("SERVER_HOST", "0.0.0.0")
-      val port: Int = env.get("SERVER_PORT").map(_.toInt).getOrElse(8080)
+      val logLevel: Level = env.get("LOG_LEVEL").map(Level.valueOf).getOrElse(default.logLevel)
+      val host: String = env.getOrElse("SERVER_HOST", default.host)
+      val port: Int = env.get("SERVER_PORT").map(_.toInt).getOrElse(default.port)
       val statusCodes: List[Status] = env.get("STATUS_CODES")
         .map(_.split("\\s*,\\s*").toList.filter(_.nonEmpty).map(e => Status.fromInt(e.toInt).toTry.get))
-        .getOrElse(List(Status.Ok))
+        .getOrElse(default.statusCodes)
       val retryTimeout: Duration = env.get("RETRY_TIMEOUT").orElse(env.get("CLIENT_TIMEOUT"))
-        .map(Duration(_)).getOrElse(5.minutes)
+        .map(Duration(_)).getOrElse(default.retryTimeout)
       val retryInterval: FiniteDuration = env.get("RETRY_INTERVAL").orElse(env.get("CLIENT_INTERVAL"))
-        .map(Duration(_).pipe(requireFinite(_, "RETRY_INTERVAL"))).getOrElse(5.seconds)
+        .map(Duration(_).pipe(requireFinite(_, "RETRY_INTERVAL"))).getOrElse(default.retryInterval)
       val connectTimeout: FiniteDuration = env.get("CONNECT_TIMEOUT")
         .map(Duration(_).pipe(requireFinite(_, "CONNECT_TIMEOUT"))).getOrElse(retryInterval)
 
