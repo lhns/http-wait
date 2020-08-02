@@ -1,5 +1,5 @@
 # http-wait
-Simple http proxy that delays the response until an expected status code is received.
+Simple http proxy that retries the request and delays the response until an expected status code is received.
 
 ## Enviromnet variables
 - LOG_LEVEL: log level (default: INFO)
