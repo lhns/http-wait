@@ -1,7 +1,5 @@
 package de.lolhens.httpwait
 
-import java.net.http.HttpClient
-
 import cats.data.OptionT
 import cats.effect.{ExitCode, Resource}
 import cats.syntax.option._
@@ -10,7 +8,7 @@ import fs2._
 import monix.eval.{Task, TaskApp}
 import org.http4s._
 import org.http4s.client.Client
-import org.http4s.client.jdkhttpclient.JdkHttpClient
+import org.http4s.client.blaze.BlazeClientBuilder
 import org.http4s.dsl.task._
 import org.http4s.headers.Host
 import org.http4s.implicits._
@@ -42,7 +40,7 @@ object Main extends TaskApp {
                      statusCodes: List[Status],
                      retryTimeout: Duration,
                      retryInterval: FiniteDuration,
-                     connectTimeout: FiniteDuration) {
+                     connectTimeout: Duration) {
     def debug: String = {
       s"""LOG_LEVEL: $logLevel
          |SERVER_HOST: $host
@@ -83,8 +81,8 @@ object Main extends TaskApp {
         .map(Duration(_)).getOrElse(default.retryTimeout)
       val retryInterval: FiniteDuration = env.get("RETRY_INTERVAL").orElse(env.get("CLIENT_INTERVAL"))
         .map(Duration(_).pipe(requireFinite(_, "RETRY_INTERVAL"))).getOrElse(default.retryInterval)
-      val connectTimeout: FiniteDuration = env.get("CONNECT_TIMEOUT")
-        .map(Duration(_).pipe(requireFinite(_, "CONNECT_TIMEOUT"))).getOrElse(retryInterval)
+      val connectTimeout: Duration = env.get("CONNECT_TIMEOUT")
+        .map(Duration(_)).getOrElse(retryInterval)
 
       Options(
         logLevel = logLevel,
@@ -119,17 +117,11 @@ object Main extends TaskApp {
     }
 
     lazy val clientResource: Resource[Task, Client[Task]] =
-      Resource.liftF(Task(JdkHttpClient[Task](
-        HttpClient.newBuilder()
-          .sslParameters {
-            val ssl = javax.net.ssl.SSLContext.getDefault
-            val params = ssl.getDefaultSSLParameters
-            params.setProtocols(Array("TLSv1.2"))
-            params
-          }
-          .connectTimeout(java.time.Duration.ofMillis(options.connectTimeout.toMillis))
-          .build()
-      )).memoizeOnSuccess)
+      Resource.suspend(Task.deferAction(scheduler => Task {
+        BlazeClientBuilder[Task](scheduler)
+          .withConnectTimeout(options.connectTimeout)
+          .resource
+      }))
 
     lazy val service: HttpRoutes[Task] = HttpRoutes[Task] { request =>
       val requestTime = System.currentTimeMillis()
