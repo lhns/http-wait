@@ -121,6 +121,12 @@ object Main extends TaskApp {
     lazy val clientResource: Resource[Task, Client[Task]] =
       Resource.liftF(Task(JdkHttpClient[Task](
         HttpClient.newBuilder()
+          .sslParameters {
+            val ssl = javax.net.ssl.SSLContext.getDefault
+            val params = ssl.getDefaultSSLParameters
+            params.setProtocols(Array("TLSv1.2"))
+            params
+          }
           .connectTimeout(java.time.Duration.ofMillis(options.connectTimeout.toMillis))
           .build()
       )).memoizeOnSuccess)
