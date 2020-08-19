@@ -186,7 +186,7 @@ object Main extends TaskApp {
             _ = {
               val responseTime = System.currentTimeMillis()
               val duration = responseTime - requestTime
-              logger.info(s"After $duration: $response")
+              logger.info(s"After ${duration}ms: $response")
             }
           } yield
             response
