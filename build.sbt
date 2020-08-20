@@ -6,6 +6,7 @@ scalaVersion := "2.13.3"
 val http4sVersion = "0.21.7"
 
 libraryDependencies ++= Seq(
+  "org.graalvm.nativeimage" % "svm" % "20.1.0" % Provided,
   "org.slf4j" % "slf4j-api" % "1.7.30",
   "ch.qos.logback" % "logback-classic" % "1.2.3",
   "io.monix" %% "monix" % "3.2.2",
@@ -49,6 +50,7 @@ enablePlugins(
 
 GraalVMNativeImage / name := (GraalVMNativeImage / name).value + "-" + (GraalVMNativeImage / version).value
 graalVMNativeImageOptions ++= Seq(
+  "--static",
   "--no-server",
   "--no-fallback",
   "--initialize-at-build-time",
