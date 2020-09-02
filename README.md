@@ -14,7 +14,7 @@ Simple http proxy that retries the request and delays the response until an expe
 - CONNECT_TIMEOUT: gateway connect timeout (default: RETRY_INTERVAL)
 
 ## Docker builds
-https://hub.docker.com/repository/docker/lolhens/http-wait
+https://github.com/users/LolHens/packages/container/http-wait
 
 ## License
 This project uses the Apache 2.0 License. See the file called LICENSE.
