@@ -50,7 +50,7 @@ enablePlugins(
 
 GraalVMNativeImage / name := (GraalVMNativeImage / name).value + "-" + (GraalVMNativeImage / version).value
 graalVMNativeImageOptions ++= Seq(
-  "--static",
+  //"--static",
   "--no-server",
   "--no-fallback",
   "--initialize-at-build-time",
