@@ -1,4 +1,5 @@
 # http-wait
+[![Docker Workflow](https://github.com/LolHens/http-wait/workflows/Docker/badge.svg)](https://github.com/LolHens/http-wait/actions?query=workflow%3ADocker)
 [![Release Notes](https://img.shields.io/github/release/LolHens/http-wait.svg?maxAge=3600)](https://github.com/LolHens/http-wait/releases/latest)
 [![Apache License 2.0](https://img.shields.io/github/license/LolHens/http-wait.svg?maxAge=3600)](https://www.apache.org/licenses/LICENSE-2.0)
 
