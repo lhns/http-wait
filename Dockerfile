@@ -1,4 +1,4 @@
-FROM lolhens/sbt-graal:graal-20.2.0-java11 as builder
+FROM lolhens/sbt-graal:graal-20.3.0-java11 as builder
 MAINTAINER LolHens <pierrekisters@gmail.com>
 COPY . .
 RUN sbt graalvm-native-image:packageBin

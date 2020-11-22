@@ -1,15 +1,15 @@
 name := "http-wait"
 version := "0.0.1-SNAPSHOT"
 
-scalaVersion := "2.13.3"
+scalaVersion := "2.13.4"
 
-val http4sVersion = "0.21.7"
+val http4sVersion = "0.21.11"
 
 libraryDependencies ++= Seq(
-  "org.graalvm.nativeimage" % "svm" % "20.2.0" % Provided,
+  "org.graalvm.nativeimage" % "svm" % "20.3.0" % Provided,
   "org.slf4j" % "slf4j-api" % "1.7.30",
   "ch.qos.logback" % "logback-classic" % "1.2.3",
-  "io.monix" %% "monix" % "3.2.2",
+  "io.monix" %% "monix" % "3.3.0",
   "org.http4s" %% "http4s-dsl" % http4sVersion,
   "org.http4s" %% "http4s-blaze-server" % http4sVersion,
   "org.http4s" %% "http4s-jdk-http-client" % "0.3.1",
