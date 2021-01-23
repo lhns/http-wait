@@ -12,6 +12,7 @@ libraryDependencies ++= Seq(
   "io.monix" %% "monix" % "3.3.0",
   "org.http4s" %% "http4s-dsl" % http4sVersion,
   "org.http4s" %% "http4s-blaze-server" % http4sVersion,
+  "de.lolhens" %% "http4s-monix" % "0.0.1",
   "org.http4s" %% "http4s-jdk-http-client" % "0.3.1",
 )
 
