@@ -6,6 +6,7 @@ scalaVersion := "2.13.4"
 val http4sVersion = "0.21.11"
 
 libraryDependencies ++= Seq(
+  "org.graalvm.nativeimage" % "svm" % "21.0.0" % Provided,
   "org.slf4j" % "slf4j-api" % "1.7.30",
   "ch.qos.logback" % "logback-classic" % "1.2.3",
   "io.monix" %% "monix" % "3.3.0",
