@@ -3,17 +3,17 @@ version := "0.0.1-SNAPSHOT"
 
 scalaVersion := "2.13.4"
 
-val http4sVersion = "0.21.11"
+val http4sVersion = "0.21.16"
 
 libraryDependencies ++= Seq(
   "org.graalvm.nativeimage" % "svm" % "21.0.0" % Provided,
-  "org.slf4j" % "slf4j-api" % "1.7.30",
+  "com.typesafe.scala-logging" %% "scala-logging" % "3.9.2",
   "ch.qos.logback" % "logback-classic" % "1.2.3",
   "io.monix" %% "monix" % "3.3.0",
   "org.http4s" %% "http4s-dsl" % http4sVersion,
   "org.http4s" %% "http4s-blaze-server" % http4sVersion,
   "de.lolhens" %% "http4s-monix" % "0.0.1",
-  "org.http4s" %% "http4s-jdk-http-client" % "0.3.1",
+  "org.http4s" %% "http4s-jdk-http-client" % "0.3.5",
 )
 
 addCompilerPlugin("com.olegpy" %% "better-monadic-for" % "0.3.1")
