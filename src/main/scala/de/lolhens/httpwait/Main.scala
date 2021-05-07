@@ -1,22 +1,21 @@
 package de.lolhens.httpwait
 
-import java.net.http.HttpClient
-
 import cats.data.OptionT
 import cats.effect.{ExitCode, Resource}
 import cats.syntax.option._
 import ch.qos.logback.classic.{Level, Logger}
+import de.lolhens.http4s.proxy.Http4sProxy._
 import fs2._
 import monix.eval.{Task, TaskApp}
 import org.http4s._
 import org.http4s.client.Client
 import org.http4s.client.jdkhttpclient.JdkHttpClient
 import org.http4s.dsl.task._
-import org.http4s.headers.Host
 import org.http4s.implicits._
 import org.http4s.server.blaze.BlazeServerBuilder
 import org.slf4j.LoggerFactory
 
+import java.net.http.HttpClient
 import scala.concurrent.duration._
 import scala.jdk.CollectionConverters._
 import scala.util.chaining._
@@ -119,7 +118,7 @@ object Main extends TaskApp {
     }
 
     lazy val clientResource: Resource[Task, Client[Task]] =
-      Resource.liftF(Task(JdkHttpClient[Task](
+      Resource.eval(Task(JdkHttpClient[Task](
         HttpClient.newBuilder()
           .sslParameters {
             val ssl = javax.net.ssl.SSLContext.getDefault
@@ -143,12 +142,9 @@ object Main extends TaskApp {
           }
         }
         response <- OptionT.liftF {
-          val authority = uri.authority.get
-          val hostHeader: Host = headers.Host(authority.host.value, authority.port)
-
           for {
             requestBytes <- request.as[Array[Byte]]
-            newRequest = request.withUri(uri).putHeaders(hostHeader).withBodyStream(Stream.chunk(Chunk.bytes(requestBytes)))
+            newRequest = request.withDestination(uri).withBodyStream(Stream.chunk(Chunk.bytes(requestBytes)))
             response <- clientResource.use { client =>
               logger.info(newRequest.toString)
 
