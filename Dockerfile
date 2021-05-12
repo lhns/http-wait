@@ -3,7 +3,7 @@ MAINTAINER LolHens <pierrekisters@gmail.com>
 COPY . .
 ARG CI_VERSION=""
 RUN sbt graalvm-native-image:packageBin
-RUN cp target/graalvm-native-image/http-wait* http-wait
+RUN cp "$(find target/graalvm-native-image -type f ! -name '*.txt')" http-wait
 
 FROM debian:10-slim
 COPY --from=builder /root/http-wait .
