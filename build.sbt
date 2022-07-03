@@ -11,7 +11,7 @@ libraryDependencies ++= Seq(
   "de.lolhens" %% "http4s-monix" % "0.0.1",
   "de.lolhens" %% "http4s-proxy" % "0.1.1",
   "io.monix" %% "monix" % "3.3.0",
-  "org.graalvm.nativeimage" % "svm" % "21.1.0" % Provided,
+  "org.graalvm.nativeimage" % "svm" % "21.3.2.1" % Provided,
   "org.http4s" %% "http4s-blaze-server" % http4sVersion,
   "org.http4s" %% "http4s-dsl" % http4sVersion,
   "org.http4s" %% "http4s-jdk-http-client" % "0.3.6",
