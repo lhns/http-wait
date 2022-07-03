@@ -9,7 +9,7 @@ libraryDependencies ++= Seq(
   "ch.qos.logback" % "logback-classic" % "1.2.11",
   "com.typesafe.scala-logging" %% "scala-logging" % "3.9.5",
   "de.lolhens" %% "http4s-monix" % "0.0.1",
-  "de.lolhens" %% "http4s-proxy" % "0.1.1",
+  "de.lolhens" %% "http4s-proxy" % "0.4.0",
   "io.monix" %% "monix" % "3.4.1",
   "org.graalvm.nativeimage" % "svm" % "22.1.0.1" % Provided,
   "org.http4s" %% "http4s-blaze-server" % http4sVersion,
