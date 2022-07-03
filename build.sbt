@@ -6,12 +6,12 @@ scalaVersion := "2.13.5"
 val http4sVersion = "0.21.22"
 
 libraryDependencies ++= Seq(
-  "ch.qos.logback" % "logback-classic" % "1.2.3",
-  "com.typesafe.scala-logging" %% "scala-logging" % "3.9.2",
+  "ch.qos.logback" % "logback-classic" % "1.2.11",
+  "com.typesafe.scala-logging" %% "scala-logging" % "3.9.5",
   "de.lolhens" %% "http4s-monix" % "0.0.1",
-  "de.lolhens" %% "http4s-proxy" % "0.1.0",
-  "io.monix" %% "monix" % "3.4.1",
-  "org.graalvm.nativeimage" % "svm" % "21.1.0" % Provided,
+  "de.lolhens" %% "http4s-proxy" % "0.1.1",
+  "io.monix" %% "monix" % "3.3.0",
+  "org.graalvm.nativeimage" % "svm" % "21.3.2.1" % Provided,
   "org.http4s" %% "http4s-blaze-server" % http4sVersion,
   "org.http4s" %% "http4s-dsl" % http4sVersion,
   "org.http4s" %% "http4s-jdk-http-client" % "0.3.6",
