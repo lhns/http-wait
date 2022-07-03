@@ -7,8 +7,8 @@ val http4sVersion = "0.21.22"
 
 libraryDependencies ++= Seq(
   "ch.qos.logback" % "logback-classic" % "1.2.11",
-  "com.typesafe.scala-logging" %% "scala-logging" % "3.9.2",
-  "de.lolhens" %% "http4s-monix" % "0.0.2",
+  "com.typesafe.scala-logging" %% "scala-logging" % "3.9.5",
+  "de.lolhens" %% "http4s-monix" % "0.0.1",
   "de.lolhens" %% "http4s-proxy" % "0.1.1",
   "io.monix" %% "monix" % "3.3.0",
   "org.graalvm.nativeimage" % "svm" % "21.3.2.1" % Provided,
