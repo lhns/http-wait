@@ -1,7 +1,7 @@
 name := "http-wait"
 version := "0.0.1-SNAPSHOT"
 
-scalaVersion := "2.13.5"
+scalaVersion := "2.13.8"
 
 val http4sVersion = "0.21.22"
 
