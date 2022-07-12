@@ -3,18 +3,23 @@ version := "0.0.1-SNAPSHOT"
 
 scalaVersion := "2.13.8"
 
-val http4sVersion = "0.21.22"
+val V = new {
+  val catsEffect = "3.3.13"
+  val http4s = "0.23.13"
+  val http4sJdkHttpClient = "0.7.0"
+  val http4sProxy = "0.4.0"
+  val logbackClassic = "1.2.11"
+  val nativeimage = "22.1.0.1"
+}
 
 libraryDependencies ++= Seq(
-  "ch.qos.logback" % "logback-classic" % "1.2.11",
-  "com.typesafe.scala-logging" %% "scala-logging" % "3.9.5",
-  "de.lolhens" %% "http4s-monix" % "0.0.1",
-  "de.lolhens" %% "http4s-proxy" % "0.1.1",
-  "io.monix" %% "monix" % "3.4.1",
-  "org.graalvm.nativeimage" % "svm" % "22.1.0.1" % Provided,
-  "org.http4s" %% "http4s-blaze-server" % http4sVersion,
-  "org.http4s" %% "http4s-dsl" % http4sVersion,
-  "org.http4s" %% "http4s-jdk-http-client" % "0.3.7",
+  "ch.qos.logback" % "logback-classic" % V.logbackClassic,
+  "de.lolhens" %% "http4s-proxy" % V.http4sProxy,
+  "org.graalvm.nativeimage" % "svm" % V.nativeimage % Provided,
+  "org.http4s" %% "http4s-ember-server" % V.http4s,
+  "org.http4s" %% "http4s-dsl" % V.http4s,
+  "org.http4s" %% "http4s-jdk-http-client" % V.http4sJdkHttpClient,
+  "org.typelevel" %% "cats-effect" % V.catsEffect,
 )
 
 addCompilerPlugin("com.olegpy" %% "better-monadic-for" % "0.3.1")
@@ -32,15 +37,7 @@ assembly / assemblyOption := (assembly / assemblyOption).value
   .copy(prependShellScript = Some(AssemblyPlugin.defaultUniversalScript(shebang = false)))
 
 assembly / assemblyMergeStrategy := {
-  case PathList("module-info.class") =>
-    MergeStrategy.discard
-
-  case PathList("META-INF", "jpms.args") =>
-    MergeStrategy.discard
-
-  case PathList("META-INF", "io.netty.versions.properties") =>
-    MergeStrategy.first
-
+  case PathList("module-info.class") => MergeStrategy.discard
   case x =>
     val oldStrategy = (assembly / assemblyMergeStrategy).value
     oldStrategy(x)

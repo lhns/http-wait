@@ -1,34 +1,34 @@
 package de.lolhens.httpwait
 
 import cats.data.OptionT
-import cats.effect.{ExitCode, Resource}
+import cats.effect.{ExitCode, IO, IOApp, Resource}
 import cats.syntax.option._
 import ch.qos.logback.classic.{Level, Logger}
+import com.comcast.ip4s.{Host, Port}
 import de.lolhens.http4s.proxy.Http4sProxy._
 import fs2._
-import monix.eval.{Task, TaskApp}
 import org.http4s._
 import org.http4s.client.Client
-import org.http4s.client.jdkhttpclient.JdkHttpClient
-import org.http4s.dsl.task._
+import org.http4s.dsl.io._
+import org.http4s.ember.server.EmberServerBuilder
 import org.http4s.implicits._
-import org.http4s.server.blaze.BlazeServerBuilder
-import org.slf4j.LoggerFactory
+import org.http4s.jdkhttpclient.JdkHttpClient
+import org.log4s.getLogger
 
 import java.net.http.HttpClient
 import scala.concurrent.duration._
 import scala.jdk.CollectionConverters._
 import scala.util.chaining._
 
-object Main extends TaskApp {
-  private val logger = LoggerFactory.getLogger(Main.getClass)
+object Main extends IOApp {
+  private val logger = getLogger
 
   private def setLogLevel(level: Level): Unit = {
     val rootLogger = org.slf4j.LoggerFactory.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME).asInstanceOf[Logger]
     rootLogger.setLevel(level)
   }
 
-  override def run(args: List[String]): Task[ExitCode] = Task.defer {
+  override def run(args: List[String]): IO[ExitCode] = IO.defer {
     val options = Options.fromEnv
     println(options.debug + "\n")
     setLogLevel(options.logLevel)
@@ -98,44 +98,46 @@ object Main extends TaskApp {
   }
 
   class Server(options: Options) {
-    lazy val run: Task[Nothing] = Task.deferAction { scheduler =>
-      BlazeServerBuilder[Task](scheduler)
-        .bindHttp(options.port, options.host)
-        .withHttpApp(service.orNotFound)
-        .resource
-        .use(_ => Task.never)
+    lazy val run: IO[Nothing] =
+      (for {
+        client <- clientResource
+        _ <- EmberServerBuilder.default[IO]
+          .withHost(Host.fromString(options.host).get)
+          .withPort(Port.fromInt(options.port).get)
+          .withHttpApp(service(client).orNotFound)
+          .build
+      } yield ())
+        .use(_ => IO.never)
+
+    lazy val clientResource: Resource[IO, Client[IO]] = JdkHttpClient[IO] {
+      val builder = HttpClient.newBuilder()
+      // workaround for https://github.com/http4s/http4s-jdk-http-client/issues/200
+      if (Runtime.version().feature() == 11) {
+        val params = javax.net.ssl.SSLContext.getDefault.getDefaultSSLParameters
+        params.setProtocols(params.getProtocols.filter(_ != "TLSv1.3"))
+        builder.sslParameters(params)
+      }
+      builder.connectTimeout(java.time.Duration.ofMillis(options.connectTimeout.toMillis))
+      builder.build()
     }
 
-    lazy val gatewayTimeout: Task[Response[Task]] = {
+    lazy val gatewayTimeout: IO[Response[IO]] = {
       (options.retryTimeout match {
         case finite: FiniteDuration =>
-          Task.sleep(finite)
+          IO.sleep(finite)
 
         case _ =>
-          Task.never
+          IO.never
 
       }) *> GatewayTimeout()
     }
 
-    lazy val clientResource: Resource[Task, Client[Task]] =
-      Resource.eval(Task(JdkHttpClient[Task](
-        HttpClient.newBuilder()
-          .sslParameters {
-            val ssl = javax.net.ssl.SSLContext.getDefault
-            val params = ssl.getDefaultSSLParameters
-            params.setProtocols(Array("TLSv1.2"))
-            params
-          }
-          .connectTimeout(java.time.Duration.ofMillis(options.connectTimeout.toMillis))
-          .build()
-      )).memoizeOnSuccess)
-
-    lazy val service: HttpRoutes[Task] = HttpRoutes[Task] { request =>
+    def service(client: Client[IO]): HttpRoutes[IO] = HttpRoutes[IO] { request =>
       val requestTime = System.currentTimeMillis()
 
       for {
-        uri <- OptionT.fromOption[Task] {
-          request.uri.path.split("/").filter(_.nonEmpty).toList.some.collect {
+        uri <- OptionT.fromOption[IO] {
+          request.uri.path.renderString.split("/").filter(_.nonEmpty).toList.some.collect {
             case (scheme@("http" | "https")) +: authorityString +: parts =>
               Uri.fromString(s"$scheme://${(authorityString +: parts).mkString("/")}").toTry.get
                 .copy(query = request.uri.query, fragment = request.uri.fragment)
@@ -143,38 +145,39 @@ object Main extends TaskApp {
         }
         response <- OptionT.liftF {
           for {
-            requestBytes <- request.as[Array[Byte]]
-            newRequest = request.withDestination(uri).withBodyStream(Stream.chunk(Chunk.bytes(requestBytes)))
-            response <- clientResource.use { client =>
-              logger.info(newRequest.toString)
-
-              lazy val retryForCode: Task[Response[Task]] = {
+            requestBytes <- request.as[Chunk[Byte]]
+            newRequest = request
+              .withDestination(uri)
+              .withBodyStream(Stream.chunk(requestBytes))
+            _ = logger.info(newRequest.toString)
+            response <- {
+              lazy val retryForCode: IO[Response[IO]] = {
                 client.run(newRequest).use { response =>
                   logger.info(response.status.toString)
 
                   if (options.statusCodes.contains(response.status))
                     for {
-                      responseBytes <- response.as[Array[Byte]]
+                      responseBytes <- response.as[Chunk[Byte]]
                     } yield
-                      response.withBodyStream(Stream.chunk(Chunk.bytes(responseBytes))).some
+                      response.withBodyStream(Stream.chunk(responseBytes)).some
                   else
-                    Task.now(none)
+                    IO(none)
                 }
-                  .onErrorHandle { err =>
-                    logger.error(err.getMessage, err)
+                  .handleError { err =>
+                    logger.error(err)(err.getMessage)
                     none
                   }
                   .flatMap {
                     case Some(response) =>
-                      Task.now(response)
+                      IO(response)
 
                     case None =>
-                      Task.sleep(options.retryInterval) *>
+                      IO.sleep(options.retryInterval) >>
                         retryForCode
                   }
               }
 
-              Task.race(
+              IO.race(
                 gatewayTimeout,
                 retryForCode
               ).map(_.merge)
