@@ -34,7 +34,7 @@ version := {
 assembly / assemblyJarName := s"${name.value}-${version.value}.sh.bat"
 
 assembly / assemblyOption := (assembly / assemblyOption).value
-  .copy(prependShellScript = Some(AssemblyPlugin.defaultUniversalScript(shebang = false)))
+  .withPrependShellScript(Some(AssemblyPlugin.defaultUniversalScript(shebang = false)))
 
 assembly / assemblyMergeStrategy := {
   case PathList("module-info.class") => MergeStrategy.discard
