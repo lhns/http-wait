@@ -1,7 +1,7 @@
 name := "http-wait"
 version := "0.0.1-SNAPSHOT"
 
-scalaVersion := "2.13.9"
+scalaVersion := "2.13.10"
 
 val V = new {
   val catsEffect = "3.3.14"
