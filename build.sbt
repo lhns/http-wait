@@ -4,11 +4,11 @@ version := "0.0.1-SNAPSHOT"
 scalaVersion := "2.13.10"
 
 val V = new {
-  val catsEffect = "3.4.0"
-  val http4s = "0.23.16"
+  val catsEffect = "3.4.4"
+  val http4s = "0.23.17"
   val http4sJdkHttpClient = "0.7.0"
   val http4sProxy = "0.4.0"
-  val logbackClassic = "1.4.4"
+  val logbackClassic = "1.4.5"
   val nativeimage = "22.3.0"
 }
 
