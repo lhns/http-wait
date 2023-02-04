@@ -14,7 +14,7 @@ val V = new {
 
 libraryDependencies ++= Seq(
   "ch.qos.logback" % "logback-classic" % V.logbackClassic,
-  "de.lolhens" %% "http4s-proxy" % V.http4sProxy,
+  "de.lhns" %% "http4s-proxy" % V.http4sProxy,
   "org.graalvm.nativeimage" % "svm" % V.nativeimage % Provided,
   "org.http4s" %% "http4s-ember-server" % V.http4s,
   "org.http4s" %% "http4s-dsl" % V.http4s,
