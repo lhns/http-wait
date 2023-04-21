@@ -109,7 +109,7 @@ object Main extends IOApp {
       } yield ())
         .use(_ => IO.never)
 
-    lazy val clientResource: Resource[IO, Client[IO]] = JdkHttpClient[IO] {
+    lazy val clientResource: Resource[IO, Client[IO]] = Resource.eval(IO(JdkHttpClient[IO] {
       val builder = HttpClient.newBuilder()
       // workaround for https://github.com/http4s/http4s-jdk-http-client/issues/200
       if (Runtime.version().feature() == 11) {
@@ -119,7 +119,7 @@ object Main extends IOApp {
       }
       builder.connectTimeout(java.time.Duration.ofMillis(options.connectTimeout.toMillis))
       builder.build()
-    }
+    }))
 
     lazy val gatewayTimeout: IO[Response[IO]] = {
       (options.retryTimeout match {
