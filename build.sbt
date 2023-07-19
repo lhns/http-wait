@@ -9,7 +9,7 @@ val V = new {
   val http4sJdkHttpClient = "0.9.1"
   val http4sProxy = "0.4.1"
   val logbackClassic = "1.4.7"
-  val nativeimage = "22.3.2"
+  val nativeimage = "22.3.3"
 }
 
 libraryDependencies ++= Seq(
