@@ -8,7 +8,7 @@ val V = new {
   val http4s = "0.23.24"
   val http4sJdkHttpClient = "0.9.1"
   val http4sProxy = "0.4.1"
-  val logbackClassic = "1.4.11"
+  val logbackClassic = "1.4.13"
   val nativeimage = "22.3.4"
 }
 
