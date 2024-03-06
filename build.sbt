@@ -5,7 +5,7 @@ scalaVersion := "2.13.11"
 
 val V = new {
   val catsEffect = "3.5.2"
-  val http4s = "0.23.24"
+  val http4s = "0.23.26"
   val http4sJdkHttpClient = "0.9.1"
   val http4sProxy = "0.4.1"
   val logbackClassic = "1.4.11"
